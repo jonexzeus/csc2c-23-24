@@ -14,7 +14,6 @@ class Main {
       Scanner myObj = new Scanner(System.in);
 
       System.out.println("Enter Philippine Peso: ");
-
       double Php = myObj.nextDouble();
 
       double Dollar = Php * phpToUsd / 43.33089;
