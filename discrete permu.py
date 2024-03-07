@@ -16,11 +16,11 @@ elements = [0, 1, 2, 3, 4, 5]
 r = 4
 
 perms = calculate_permutations(elements, r)
-combs= calculate_combinations(elements, r)
+combs = calculate_combinations(elements, r)
 
 user_input = input("Enter a 4-digit number: ")
 
-select = random.sample(combs)
+selected_comb = random.choice(combs)  # Randomly select one combination
 
 if len(user_input) == 4 and user_input.isdigit():
     if check_combination_match(user_input, perms):
@@ -30,5 +30,5 @@ if len(user_input) == 4 and user_input.isdigit():
 else:
     print("Invalid input. Please enter a 4-digit number.")
 
-print("selected comb:", select)
-print("Combinations: ", combs)
+print("Selected combination:", selected_comb)
+
