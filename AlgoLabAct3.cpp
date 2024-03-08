@@ -1,63 +1,70 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
+#include <limits>
+
 using namespace std;
 
-int n;
-int graph[10][10];
-bool visited[10];
+const int INF = numeric_limits<int>::max();
 
-void TSPUtil(int curr_pos, int cost) {
-    if (cost >= 70)
-        return;
-
-    if (curr_pos == n - 1) {
-        cost += graph[curr_pos][0];
-
-        if (cost <= 70) {
-            cout << "Approximate shortest route length: " << cost << endl;
-            return;
-        }
-
-        return;
+int tsp(const vector<vector<int>>& graph, int pos, int visited, vector<vector<int>>& dp, vector<vector<int>>& path) {
+    if (visited == ((1 << graph.size()) - 1)) {
+        return graph[pos][0]; // Return to starting city
+    }
+    
+    if (dp[pos][visited] != -1) {
+        return dp[pos][visited];
     }
 
-    for (int i = 1; i < n; i++) {
-        if (!visited[i] && graph[curr_pos][i] != 0) {
-            visited[i] = true;
-            TSPUtil(i, cost + graph[curr_pos][i]);
-            visited[i] = false;
+    int ans = INF;
+    int nextCity = -1;
+    
+    for (int i = 0; i < graph.size(); ++i) {
+        if ((visited & (1 << i)) == 0 && graph[pos][i] > 0) { 
+            int newAns = graph[pos][i] + tsp(graph, i, visited | (1 << i), dp, path);
+            if (newAns < ans) {
+                ans = newAns;
+                nextCity = i;
+            }
         }
     }
+
+    path[pos][visited] = nextCity; // Store the next city in the path
+
+    return dp[pos][visited] = ans;
 }
 
-void TSP(int graph[][10]) {
-    n = 4;
+void printPath(const vector<vector<int>>& path, int start, int visited) {
+    int currentCity = start;
+    cout << "Approximate shortest route: " << static_cast<char>('A' + currentCity) << " ";
 
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            if (i != j && graph[i][j] == 0)
-                graph[i][j] = 1000000;
-        }
+    while (visited != ((1 << path.size()) - 1)) {
+        int nextCity = path[currentCity][visited];
+        cout << "-> " << static_cast<char>('A' + nextCity) << " ";
+        currentCity = nextCity;
+        visited |= (1 << nextCity);
     }
 
-    visited[0] = true;
-    TSPUtil(0, 0);
+    cout << endl;
 }
 
 int main() {
-    graph[0][1] = 50;
-    graph[0][2] = 30;
-    graph[0][3] = 25;
-    graph[1][0] = 50;
-    graph[1][2] = 40;
-    graph[1][3] = 10;
-    graph[2][0] = 30;
-    graph[2][1] = 40;
-    graph[2][3] = 15;
-    graph[3][0] = 25;
-    graph[3][1] = 10;
-    graph[3][2] = 15;
+    vector<vector<int>> graph = {
+        {0, 50, 25, 30},
+        {50, 0, 30, 10},
+        {30, 10, 0, 15},
+        {25, 10, 15, 0}
+    };
+    
+    int n = graph.size();
+    vector<vector<int>> dp(n, vector<int>(1 << n, -1));
+    vector<vector<int>> path(n, vector<int>(1 << n, -1));
 
-    TSP(graph);
+    int shortestRouteLength = tsp(graph, 0, 1, dp, path);
+    
+    cout << "Approximate shortest route length: " << shortestRouteLength << endl;
+
+    // Print the path taken
+    printPath(path, 0, 1);
 
     return 0;
 }
